@@ -8,11 +8,13 @@ import org.xmlcml.cmine.files.CTree;
 import org.xmlcml.cmine.files.CTreeList;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 public class Wanda {
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws ParseException, IOException {
 		// parse arguments from command line - what to summarise (all plugins?)
 		Options options = new Options();
 		options.addOption("q", "project", true, "CProject");
@@ -28,7 +30,7 @@ public class Wanda {
 		CProject cProject = new CProject(new File(cProjectPath));
 
 		new SnippetSummariser().summarise(cProject);
-		// Write HTML tables
+		// TODO: Write HTML tables
 
 	}
 	

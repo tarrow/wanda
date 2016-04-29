@@ -3,6 +3,11 @@ package org.xmlcml.wanda;
 import com.sun.istack.internal.NotNull;
 import org.xmlcml.cmine.files.CProject;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Set;
+
 /**
  *
  * Created by tom on 27/04/16.
@@ -29,6 +34,13 @@ public interface Summariser {
      * @param CProject
      *
      */
-    public void summarise(CProject CProject);
+    public void summarise(CProject CProject) throws IOException;
+
+    /**
+     * get a list of the plugins which this summariser can summarise.
+     *
+     * @return Set of strings of the plugins this summariser can summarise
+     */
+    public Set<String> getSummarisablePlugins();
 
     }
