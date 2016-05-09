@@ -14,8 +14,12 @@ public class WordCountVector {
 
     private Map<String, Integer> wordCountVector = new HashMap<String, Integer>();
 
-    public void WordCountVector() {
+    public WordCountVector() {
 
+    }
+
+    public WordCountVector(Map<String, Integer> map) {
+        wordCountVector = map;
     }
 
     public int getCount(String string) {
@@ -38,5 +42,14 @@ public class WordCountVector {
     }
 
     public Map<String, Integer> getMap() { return wordCountVector; }
+
+    public WordCountVector addWordCountVector(WordCountVector addWordCountVector) {
+        Map<String, Integer> combinedVector = wordCountVector;
+        for ( Map.Entry<String, Integer> wordMagnitude : addWordCountVector.getMap().entrySet() ) {
+            Integer totalCount = wordMagnitude.getValue()+getCount(wordMagnitude.getKey());
+            combinedVector.put(wordMagnitude.getKey(), totalCount);
+        }
+        return new WordCountVector(combinedVector);
+    }
 
 }

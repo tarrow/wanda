@@ -66,10 +66,20 @@ public class FrequencySummariser extends AbstractSummariser {
         //Write the per plugin frequencies for whole CProject
         //TODO Merge duplicate entries that we put in here by not adding WordVectors
         Gson gson = new Gson();
+
+        Map<String, WordCountVector> wordFrequencyByPlugin = new HashMap<String, WordCountVector>();
+
         for (Entry<ResultsFile, WordCountVector> entry : resultsFilesWordCounts.entrySet()) {
+            if (wordFrequencyByPlugin.containsKey(entry.getKey().getPluginName())) {
+                wordFrequencyByPlugin.get(entry.getKey().getPluginName()).addWordCountVector(entry.getValue());
+            }
+            else { wordFrequencyByPlugin.put(entry.getKey().getPluginName(),entry.getValue()); }
+        }
+
+        for (Map.Entry<String, WordCountVector> entry : wordFrequencyByPlugin.entrySet()) {
             Map<String, Integer> aMap = entry.getValue().getMap();
             String json = gson.toJson(aMap);
-            String pluginName = entry.getKey().getPluginName();
+            String pluginName = entry.getKey();
             if (pluginOutputFileMap.containsKey(pluginName)) {
                 pluginOutputFileMap.get(pluginName).write(json.getBytes());
             }
