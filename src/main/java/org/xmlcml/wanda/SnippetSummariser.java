@@ -15,6 +15,7 @@ import org.xmlcml.cmine.files.*;
 import org.xmlcml.cmine.util.XMLUtils;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -25,11 +26,11 @@ import java.util.*;
  * writes them into the summary/snippet/ directory
  *
  */
-public class SnippetSummariser implements Summariser {
+public class SnippetSummariser extends AbstractSummariser {
 
     private static Set<String> SUMMARISABLE_PLUGINS = Sets.newHashSet("gene", "sequence", "species");
 
-    private String SummaryFolder = "summary/";
+    protected String SummaryFolder = "summary/";
 
     private static String name = "snippet";
 
@@ -37,43 +38,38 @@ public class SnippetSummariser implements Summariser {
 
     }
 
-    public Set getSummarisablePlugins() { return SUMMARISABLE_PLUGINS; }
+    public Set getSummarisablePlugins() {
+        return SUMMARISABLE_PLUGINS;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void summarise(CProject CProject) throws IOException {
+    public void summarise(CProject cproject) throws IOException {
 
         // Make a map between the string names of the plugins and the files to write
         // their summaries in.
-        Map<String, FileOutputStream> pluginOutputFileMap = new HashMap<String, FileOutputStream>();
-        for ( String pluginName : SUMMARISABLE_PLUGINS ) {
-            File outfile =  new File (CProject.getDirectory(), SummaryFolder+name+"/"+pluginName+"/snippet.xml");
-            outfile.getParentFile().mkdirs();
-            pluginOutputFileMap.put(pluginName, new FileOutputStream(outfile));
-        }
+        Map<String, FileOutputStream> pluginOutputFileMap = generatePluginOutputFileMap(cproject);
+
 
         // Make a map of elements in which we store many sets of results indexed by plugin name
         Map<String, Element> pluginResultsListMap = new HashMap<String, Element>();
-        for ( String pluginName : SUMMARISABLE_PLUGINS ) {
+        for (String pluginName : SUMMARISABLE_PLUGINS) {
             pluginResultsListMap.put(pluginName, new Element("ProjectSnippets"));
         }
 
         // Find all results files in each CTree and add the contents of the results files
         // to PluginResultsListMap
-        CTreeList cTreeList = CProject.getCTreeList();
-        WildcardFileFilter fileFilter = new WildcardFileFilter("results.xml");
-        for (CTree ctree : cTreeList) {
-            Collection<File> resultsFiles = FileUtils.listFiles(ctree.getDirectory(), fileFilter, TrueFileFilter.INSTANCE);
-            for (File file : resultsFiles) {
-                ResultsFileImpl resultsFile = new ResultsFileImpl(file);
-                String pluginName = resultsFile.getPluginName();
-                if (pluginResultsListMap.containsKey(pluginName)) {
-                    pluginResultsListMap.get(pluginName).appendChild(resultsFile.getResultsElement());
-                }
+        Collection<File> resultsFiles = ResultsFileList(cproject);
+        for (File file : resultsFiles) {
+            ResultsFileImpl resultsFile = new ResultsFileImpl(file);
+            String pluginName = resultsFile.getPluginName();
+            if (pluginResultsListMap.containsKey(pluginName)) {
+                pluginResultsListMap.get(pluginName).appendChild(resultsFile.getResultsElement());
             }
         }
+
 
         // Write all of the results stores to the correct file
         for (Map.Entry<String, Element> entry : pluginResultsListMap.entrySet()) {
@@ -82,4 +78,7 @@ public class SnippetSummariser implements Summariser {
             serializer.write(document);
         }
     }
+
+
 }
+
