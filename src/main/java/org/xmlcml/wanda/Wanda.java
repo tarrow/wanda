@@ -30,6 +30,7 @@ public class Wanda {
 		CProject cProject = new CProject(new File(cProjectPath));
 
 		new SnippetSummariser().summarise(cProject);
+		new FrequencySummariser().summarise(cProject);
 		// TODO: Write HTML tables
 
 	}
